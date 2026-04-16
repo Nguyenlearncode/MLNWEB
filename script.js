@@ -2,8 +2,9 @@
  * MLN111 - NHÓM 5: Multi-page Navigation Script
  */
 document.addEventListener('DOMContentLoaded', () => {
-    const TOTAL_PAGES = 18;
+    const validPages = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18];
     const currentPage = parseInt(document.body.dataset.page) || 1;
+    const currentIndex = validPages.indexOf(currentPage);
 
     // === Mobile Nav Toggle ===
     const navToggle = document.getElementById('navToggle');
@@ -33,29 +34,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Keyboard Navigation ===
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (currentPage < TOTAL_PAGES) {
-                window.location.href = `page${currentPage + 1}.html`;
-            }
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (currentPage > 1) {
-                window.location.href = `page${currentPage - 1}.html`;
+        if (currentIndex !== -1) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (currentIndex < validPages.length - 1) {
+                    window.location.href = `page${validPages[currentIndex + 1]}.html`;
+                }
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (currentIndex > 0) {
+                    window.location.href = `page${validPages[currentIndex - 1]}.html`;
+                }
             }
         }
     });
 
-    // === Page dots ===
+    // === Page dots & Indicators ===
     const dotsContainer = document.querySelector('.page-dots');
     if (dotsContainer) {
-        for (let i = 1; i <= TOTAL_PAGES; i++) {
+        validPages.forEach((i, index) => {
             const dot = document.createElement('a');
             dot.href = `page${i}.html`;
             dot.className = `page-dot${i === currentPage ? ' active' : ''}`;
-            dot.title = `Trang ${i}`;
+            dot.title = `Trang ${index + 1}`;
             dotsContainer.appendChild(dot);
-        }
+        });
+    }
+    
+    // Auto update page indicator text
+    const indicator = document.querySelector('.page-indicator');
+    if (indicator && currentIndex !== -1) {
+        indicator.textContent = `TRANG ${currentIndex + 1} / ${validPages.length}`;
     }
 
     // === Entrance animations ===
@@ -90,11 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchend', (e) => {
         touchEndX = e.changedTouches[0].screenX;
         const diff = touchStartX - touchEndX;
-        if (Math.abs(diff) > 80) {
-            if (diff > 0 && currentPage < TOTAL_PAGES) {
-                window.location.href = `page${currentPage + 1}.html`;
-            } else if (diff < 0 && currentPage > 1) {
-                window.location.href = `page${currentPage - 1}.html`;
+        if (Math.abs(diff) > 80 && currentIndex !== -1) {
+            if (diff > 0 && currentIndex < validPages.length - 1) {
+                window.location.href = `page${validPages[currentIndex + 1]}.html`;
+            } else if (diff < 0 && currentIndex > 0) {
+                window.location.href = `page${validPages[currentIndex - 1]}.html`;
             }
         }
     }, { passive: true });
